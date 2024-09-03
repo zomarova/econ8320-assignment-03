@@ -1,0 +1,38 @@
+name: Autograding Tests
+'on': {}
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test Complex Numbers Class
+      id: test-complex-numbers-class
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test Complex Numbers Class
+        setup-command: ''
+        command: python -m unittest tests/testComplexNumber.py
+        timeout: 1
+        max-score: 2
+    - name: Test Academic Record Class
+      id: test-academic-record-class
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Test Academic Record Class
+        setup-command: ''
+        command: python -m unittest tests/testAcademicRecord.py
+        timeout: 1
+        max-score: 4
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST-COMPLEX-NUMBERS-CLASS_RESULTS: "${{steps.test-complex-numbers-class.outputs.result}}"
+        TEST-ACADEMIC-RECORD-CLASS_RESULTS: "${{steps.test-academic-record-class.outputs.result}}"
+      with:
+        runners: test-complex-numbers-class,test-academic-record-class
